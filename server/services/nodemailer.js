@@ -1,5 +1,5 @@
-import { EMAIL_CONFIG } from "config";
-import nodemailer from "nodemailer";
+const { EMAIL_CONFIG } = require("config");
+const nodemailer = require("nodemailer");
 
 
 const transporter = nodemailer.createTransport({
@@ -18,7 +18,7 @@ const transporter = nodemailer.createTransport({
  * @param {String} html
  * @returns {Boolean}
  */
-export const sendEmail = async (to, subject, text, html) => {
+module.exports = async (to, subject, text, html) => {
     try {
         if (!(to && subject && (text || html))) return false;
 
