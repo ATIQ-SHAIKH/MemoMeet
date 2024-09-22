@@ -1,0 +1,28 @@
+{
+  "name": "memomeet",
+  "version": "1.0.0",
+  "description": "A real-time video conferencing platform",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ATIQ-SHAIKH/MemoMeet.git"
+  },
+  "keywords": [
+    "memomeet"
+  ],
+  "author": "Atiq Shaikh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ATIQ-SHAIKH/MemoMeet/issues"
+  },
+  "homepage": "https://github.com/ATIQ-SHAIKH/MemoMeet#readme",
+  "dependencies": {
+    "config": "^3.3.12",
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "helmet": "^7.1.0"
+  }
+}
