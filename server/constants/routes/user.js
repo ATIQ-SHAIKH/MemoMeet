@@ -1,7 +1,7 @@
 module.exports = {
     ROOT: "/user",
     PUBLIC: {
-        SIGNUP: "/signup"
+        SIGNUP_INVITE: "/signup/invite"
     },
     PRIVATE: {}
 }
