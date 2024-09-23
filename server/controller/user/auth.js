@@ -1,7 +1,7 @@
 "use strict";
 
 const crypto = require("crypto");
-const { sendEmail } = require("../../services/nodemailer");
+const sendEmail = require("../../services/nodemailer");
 const RESPONSES = require("../../constants/responseCodes");
 const { GENERAL: GENERAL_MESSAGES, USER_SIGNUP: USER_SIGNUP_MESSAGES } = require("../../constants/messages");
 const DBFactory = require("../../manager/index");
@@ -24,6 +24,8 @@ const signupInvite = async (req, res) => {
             else return res.json({ msg: USER_SIGNUP_MESSAGES.EMAIL_SENT });
         }
         const verificationToken = crypto.randomBytes(32).toString("hex");
+        const sent = sendEmail(email, "MemoMeet: Email Verification", `Click on this link to verify your email: https://localhost:8000/api/user/email=${email}&&token=${verificationToken}`);
+        if (!sent) return res.status(RESPONSES.INTERNAL_SERVER_ERROR).json({ msg: USER_SIGNUP_MESSAGES.FAILED_TO_SEND_EMAIL });
         const newUser = await userManager.create({
             name,
             email,
