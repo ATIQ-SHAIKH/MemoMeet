@@ -19,6 +19,12 @@ module.exports = {
     USER_SIGNUP: {
         ALREADY_SIGNED_UP: "This email already has an account, please login.",
         FAILED_TO_SEND_EMAIL: "Failed to send email!",
-        EMAIL_SENT: "Email sent. Please check your email!"
+        EMAIL_SENT: "Email sent. Please check your email!",
+        USER_NOT_FOUND: "User not found, please signup first!",
+        USER_EXISTS_LOGIN: "This email is in use, try login!",
+        TRY_SIGNUP_AGAIN: "Some error occured, Try signup again!",
+        TOKEN_EXPIRED_TRY_SIGNUP_AGAIN: "Token has expired, Try signup again!",
+        INVALID_TOKEN: "Invalid token!",
+        TOKEN_VERIFIED_LOGIN: "Token verified! proceed to login!"
     }
 }
