@@ -1,10 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const { PUBLIC: ROUTES } = require("../../constants/routes/user");
-const { signupInvite } = require("../../controller/user/auth");
-const { userSignupInviteValidation } = require("../../validators");
+const { USER_ROUTES: { PUBLIC: USER_ROUTES } } = require("../../constants/routes");
+const { signupInvite, signupSetPassword } = require("../../controller/user/auth");
+const { userSignupInviteValidation, userSignupSetPasswordValidation } = require("../../validators");
 
 
-router.post(ROUTES.SIGNUP_INVITE, userSignupInviteValidation, signupInvite)
+router.post(USER_ROUTES.SIGNUP_INVITE, userSignupInviteValidation, signupInvite);
+
+router.post(USER_ROUTES.SIGNUP_SET_PASSWORD, userSignupSetPasswordValidation, signupSetPassword);
 
 module.exports = router;

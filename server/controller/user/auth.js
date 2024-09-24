@@ -44,4 +44,35 @@ const signupInvite = async (req, res) => {
     }
 };
 
-module.exports = { signupInvite };
+const signupSetPassword = async (req, res) => {
+    console.log("signupSetPassword")
+    try {
+        const { email, password, token } = req.body;
+        const userManager = DBFactory.loadModel("user");
+        const user = await userManager.findOne({ email });
+
+        const now = new Date();
+        const { verification_token, verification_token_expires_at } = user.email_verification_info;
+
+        // check if user exists
+        if (!user) return res.status(RESPONSES.NOT_FOUND).json({ msg: USER_SIGNUP_MESSAGES.USER_NOT_FOUND });
+        // check if user has not set the password already
+        else if (user.password) return res.status(RESPONSES.CONFLICT).json({ msg: USER_SIGNUP_MESSAGES.USER_EXISTS_LOGIN });
+        // check if verification token exists for the user
+        else if (!verification_token) return res.status(RESPONSES.INTERNAL_SERVER_ERROR).json({ msg: USER_SIGNUP_MESSAGES.TRY_SIGNUP_AGAIN });
+        // check if token has not expired
+        else if (now.getTime() < verification_token_expires_at.getTime()) return res.status(RESPONSES.GONE).json({ msg: USER_SIGNUP_MESSAGES.TOKEN_EXPIRED_TRY_SIGNUP_AGAIN });
+        // check if token is correct
+        else if (token !== verification_token) return res.status(RESPONSES.FORBIDDEN).json({ msg: USER_SIGNUP_MESSAGES.INVALID_TOKEN });
+
+        const { modifiedCount } = await userManager.updateOne({ email }, { $set: { password, "email_verification_info.is_verified": true, "email_verification_info.verified_on": now } });
+        if (!modifiedCount) return res.status(RESPONSES.INTERNAL_SERVER_ERROR).json({ msg: GENERAL_MESSAGES.SOME_UNKNOWN_ERROR_OCCURED });
+
+        return res.json({ msg: USER_SIGNUP_MESSAGES.TOKEN_VERIFIED_LOGIN })
+    } catch (e) {
+        console.log(e);
+        return res.status(RESPONSES.INTERNAL_SERVER_ERROR).json({ msg: GENERAL_MESSAGES.SOME_UNKNOWN_ERROR_OCCURED })
+    }
+}
+
+module.exports = { signupInvite, signupSetPassword };
