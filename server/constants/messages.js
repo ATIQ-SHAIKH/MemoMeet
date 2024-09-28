@@ -1,9 +1,11 @@
 "use strict";
 
+
 module.exports = {
     GENERAL: {
         OK: "OK",
-        SOME_UNKNOWN_ERROR_OCCURED: "Some unknown error occured"
+        SOME_UNKNOWN_ERROR_OCCURED: "Some unknown error occured",
+        UNAUTHORIZED: "Unauthorized!"
     },
     ERROR: {
         MODEL_NAME_IS_REQUIRED: "Model name is required!",
@@ -26,5 +28,11 @@ module.exports = {
         TOKEN_EXPIRED_TRY_SIGNUP_AGAIN: "Token has expired, Try signup again!",
         INVALID_TOKEN: "Invalid token!",
         TOKEN_VERIFIED_LOGIN: "Token verified! proceed to login!"
+    },
+    USER_LOGIN: {
+        USER_NOT_FOUND: "User not found, please signup first!",
+        LOGGED_IN: "Logged in!",
+        CHECK_EMAIL: "Check your email, to set a password!",
+        INVALID_PASSWORD: "Invalid password!",
     }
 }

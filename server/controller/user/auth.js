@@ -3,8 +3,9 @@
 const crypto = require("crypto");
 const sendEmail = require("../../services/nodemailer");
 const RESPONSES = require("../../constants/responseCodes");
-const { GENERAL: GENERAL_MESSAGES, USER_SIGNUP: USER_SIGNUP_MESSAGES } = require("../../constants/messages");
+const { GENERAL: GENERAL_MESSAGES, USER_SIGNUP: USER_SIGNUP_MESSAGES, USER_LOGIN: USER_LOGIN_MESSAGES } = require("../../constants/messages");
 const DBFactory = require("../../manager/index");
+const { jwtSign } = require("../../middleware/auth")
 
 const signupInvite = async (req, res) => {
     console.log("signupInvite")
@@ -49,10 +50,10 @@ const signupSetPassword = async (req, res) => {
     try {
         const { email, password, token } = req.body;
         const userManager = DBFactory.loadModel("user");
-        const user = await userManager.findOne({ email });
+        const user = await userManager.findOne({ email }, { email_verification_info: 1 });
 
         const now = new Date();
-        const { verification_token, verification_token_expires_at } = user.email_verification_info;
+        const { email_verification_info: { verification_token, verification_token_expires_at } } = user;
 
         // check if user exists
         if (!user) return res.status(RESPONSES.NOT_FOUND).json({ msg: USER_SIGNUP_MESSAGES.USER_NOT_FOUND });
@@ -61,7 +62,7 @@ const signupSetPassword = async (req, res) => {
         // check if verification token exists for the user
         else if (!verification_token) return res.status(RESPONSES.INTERNAL_SERVER_ERROR).json({ msg: USER_SIGNUP_MESSAGES.TRY_SIGNUP_AGAIN });
         // check if token has not expired
-        else if (now.getTime() < verification_token_expires_at.getTime()) return res.status(RESPONSES.GONE).json({ msg: USER_SIGNUP_MESSAGES.TOKEN_EXPIRED_TRY_SIGNUP_AGAIN });
+        else if (now.getTime() > verification_token_expires_at.getTime()) return res.status(RESPONSES.GONE).json({ msg: USER_SIGNUP_MESSAGES.TOKEN_EXPIRED_TRY_SIGNUP_AGAIN });
         // check if token is correct
         else if (token !== verification_token) return res.status(RESPONSES.FORBIDDEN).json({ msg: USER_SIGNUP_MESSAGES.INVALID_TOKEN });
 
@@ -75,4 +76,28 @@ const signupSetPassword = async (req, res) => {
     }
 }
 
-module.exports = { signupInvite, signupSetPassword };
+const login = async (req, res) => {
+    console.log("login")
+    try {
+        const { email, password } = req.body;
+        const userManager = DBFactory.loadModel("user");
+        const user = await userManager.findOne({ email });
+
+        // check if user exists
+        if (!user) return res.status(RESPONSES.NOT_FOUND).json({ msg: USER_LOGIN_MESSAGES.USER_NOT_FOUND });
+        const { password: password_in_db, email_verification_info: { is_verified } } = user;
+        // check if user is verified
+        if (!is_verified) return res.status(RESPONSES.UNAUTHORIZED).json({ msg: USER_LOGIN_MESSAGES.CHECK_EMAIL });
+        // check if password is correct
+        else if (password !== password_in_db) return res.status(RESPONSES.INTERNAL_SERVER_ERROR).json({ msg: USER_LOGIN_MESSAGES.INVALID_PASSWORD })
+
+        const token = await jwtSign({ _id: user._id, email });
+
+        return res.json({ msg: USER_LOGIN_MESSAGES.LOGGED_IN, data: { token } });
+    } catch (e) {
+        console.log(e);
+        return res.status(RESPONSES.INTERNAL_SERVER_ERROR).json({ msg: GENERAL_MESSAGES.SOME_UNKNOWN_ERROR_OCCURED })
+    }
+}
+
+module.exports = { signupInvite, signupSetPassword, login };

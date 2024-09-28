@@ -1,5 +1,6 @@
 "use strict";
 
+const RESPONSES = require("../constants/responseCodes");
 const { validationResult } = require("express-validator");
 const userRules = require("./user");
 const validationRules = {};
