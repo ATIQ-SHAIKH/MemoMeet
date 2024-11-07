@@ -3,12 +3,14 @@ const { GENERAL: GENERAL_MESSAGES, USER_SIGNUP: USER_SIGNUP_MESSAGES, USER_LOGIN
 const RESPONSES = require("../constants/responseCodes");
 
 const jwtAuth = async (req, res, next) => {
-    if (!req.headers.authorization) {
+    console.log(req.cookies)
+    if (!req?.cookies?.token) {
         return res
             .status(RESPONSES.FORBIDDEN)
             .json({ msg: GENERAL_MESSAGES.UNAUTHORIZED });
     }
-    const token = req.headers.authorization.split(" ")[1] || "";
+    // const token = req.headers.authorization.split(" ")[1] || "";
+    const token = req.cookies.token;
     if (!token) {
         return res
             .status(RESPONSES.FORBIDDEN)

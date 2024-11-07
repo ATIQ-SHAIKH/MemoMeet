@@ -19,8 +19,14 @@ const login = [
     body("password").isString().trim().matches(REGEX.PASSWORD).withMessage("Please enter a valid password!"),
 ]
 
+const userSignIn = [
+    body("email").isEmail().withMessage("Please enter a correct email!"),
+    body("password").isString().trim().matches(REGEX.PASSWORD).withMessage("Please enter a valid password!"),
+]
+
 module.exports = {
     userSignupInvite,
     userSignupSetPassword,
-    login
+    login,
+    userSignIn
 }

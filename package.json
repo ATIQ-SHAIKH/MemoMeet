@@ -21,6 +21,8 @@
   "homepage": "https://github.com/ATIQ-SHAIKH/MemoMeet#readme",
   "dependencies": {
     "config": "^3.3.12",
+    "cookie": "^1.0.1",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^16.4.5",
