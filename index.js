@@ -5,9 +5,9 @@ const obscureHeader = require("./server/middleware/obscureHeader");
 const {
     ALLOWED_DOMAIN,
     SCRIPT_SOURCES,
-    SRV_PORT,
 } = require("config");
-const apiRoutes = require("./server/routes");
+require('dotenv').config();
+const apiRoutes = require("./server/routes")
 
 // Start & init express app
 const app = express();
@@ -75,7 +75,9 @@ app.get("/*", (_, res) =>
     // res.send(WELCOME_PAGE)
 );
 
+require("./server/models");
+
 // Bind to port
-app.listen(SRV_PORT, () =>
-    console.log(`🚀 Server running at ${SRV_PORT}`),
+app.listen(process.env.SRV_PORT, () =>
+    console.log(`🚀 Server running at ${process.env.SRV_PORT}`),
 );
