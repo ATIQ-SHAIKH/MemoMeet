@@ -78,7 +78,7 @@ app.get("/*", (_, res) =>
 require("./server/models");
 
 // Bind to port
-if (process.env.ENV === "production") {
+if (process.env.ENV === "development") {
     app.listen(process.env.SRV_PORT, () =>
         console.log(`🚀 Server running at ${process.env.SRV_PORT}`),
     );
