@@ -66,13 +66,8 @@ app.get("/example", (req, res) => {
     res.send(`Client IP: ${req.ip}`);
 });
 
-app.get("/user/signin", (req, res) => {
-    console.log(req.ip); // Logs client's IP address
-    res.send(`Client IP: ${req.ip}`);
-});
-
 // Load APIs
-app.use("/api", apiRoutes);
+app.use("/", apiRoutes);
 
 // Serve static build files
 app.get("/*", (_, res) =>
