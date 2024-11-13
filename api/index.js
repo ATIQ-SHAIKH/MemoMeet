@@ -56,7 +56,7 @@ app.use(
 app.use(
     cors({
         origin: ALLOWED_DOMAIN,
-        methods: ["GET", "POST", "DELETE", "PUT"],
+        methods: ["GET", "POST", "DELETE", "PUT", "OPTIONS"],
         credentials: true,
     }),
 );

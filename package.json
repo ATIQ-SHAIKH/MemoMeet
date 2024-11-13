@@ -4,7 +4,7 @@
   "description": "A real-time video conferencing platform",
   "main": "/api/index.js",
   "scripts": {
-    "start": "node /api/index.js"
+    "start": "node ./api/index.js"
   },
   "repository": {
     "type": "git",
