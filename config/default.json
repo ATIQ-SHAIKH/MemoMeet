@@ -1,0 +1,15 @@
+{
+	"ALLOWED_DOMAIN": [
+		"http://localhost:3000",
+		"http://localhost:3001",
+		"https://memo-meet.netlify.app"
+	],
+	"SCRIPT_SOURCES": ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+	"EMAIL_CONFIG": {
+		"EMAIL": "atikshaikh436@gmail.com",
+		"SERVICE": "gmail",
+		"HOST": "smtp.gmail.com",
+		"PORT": 587,
+		"SECURE": false
+	}
+}
