@@ -7,7 +7,10 @@ const transporter = nodemailer.createTransport({
     host: EMAIL_CONFIG.HOST,
     port: EMAIL_CONFIG.PORT,
     secure: EMAIL_CONFIG.SECURE,
-    auth: EMAIL_CONFIG.AUTH,
+    auth: {
+			"user": process.env.EMAIL_CONFIG_AUTH_USER,
+			"pass": process.env.EMAIL_CONFIG_AUTH_PASS
+		}
 });
 
 /**
