@@ -84,6 +84,4 @@ require("./server/models");
     );
 // }
 
-// module.exports = (req, res) => {
-//     app(req, res);
-// };
+module.exports = app;
