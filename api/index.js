@@ -1,13 +1,13 @@
 const cors = require("cors");
 const express = require("express");
 const helmet = require("helmet");
-const obscureHeader = require("./server/middleware/obscureHeader");
+const obscureHeader = require("../server/middleware/obscureHeader");
 const {
     ALLOWED_DOMAIN,
     SCRIPT_SOURCES,
 } = require("config");
 require('dotenv').config();
-const apiRoutes = require("./server/routes")
+const apiRoutes = require("../server/routes")
 
 // Start & init express app
 const app = express();
@@ -75,7 +75,7 @@ app.get("/*", (_, res) =>
     // res.send(WELCOME_PAGE)
 );
 
-require("./server/models");
+require("../server/models");
 
 // Bind to port
 // if (process.env.ENV === "production") {
