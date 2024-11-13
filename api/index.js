@@ -67,7 +67,7 @@ app.get("/example", (req, res) => {
 });
 
 // Load APIs
-app.use("/", apiRoutes);
+app.use("/api", apiRoutes);
 
 // Serve static build files
 app.get("/*", (_, res) =>
