@@ -10,14 +10,17 @@ const createMeetCode = async (req, res) => {
         const meetDoc = { created_by: req.user.email, meet_code: uuidv4().split('-')[0] };
 
         const meetManager = DBFactory.loadModel("meet");
-        const meetCodeInUse = await meetManager.countDocuments({ meet_code: { $match: meetCode, $options: "i" } });
+        const meetCodeInUse = await meetManager.countDocuments({ meet_code: { $regex: `/^${meetDoc.meet_code}/`, $options: "i" } });
         if (meetCodeInUse) meetDoc.meet_code = `${meetDoc.meet_code}-${meetCodeInUse + 1}`;
         const meet = await meetManager.create(meetDoc);
+        console.log({ meet })
         if (!meet) return res.status(RESPONSES.INTERNAL_SERVER_ERROR).json({ msg: GENERAL_MESSAGES.SOME_UNKNOWN_ERROR_OCCURED })
 
-        return res.json({ meetCode: meet.meet_doc });
+        return res.json({ meet_code: meet.meet_code });
     } catch (e) {
         console.log(e);
         return res.status(RESPONSES.INTERNAL_SERVER_ERROR).json({ msg: GENERAL_MESSAGES.SOME_UNKNOWN_ERROR_OCCURED })
     }
 }
+
+module.exports = { createMeetCode }

@@ -12,7 +12,8 @@ module.exports = {
         PRIVATE: {
             ROOT: "/private",
             CHECK_SESSION: "/check/session",
-            LOGOUT: "/logout"
+            LOGOUT: "/logout",
+            CREATE_MEET_CODE: "/create/meet/code"
         }
     }
 }

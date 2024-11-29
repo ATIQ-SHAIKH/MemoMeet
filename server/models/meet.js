@@ -4,7 +4,7 @@ const { Schema, model } = require("mongoose");
 
 const meet = new Schema(
     {
-        name: { type: String, required: true },
+        name: { type: String },
         meet_code: { type: String, required: true, unique: true },
         created_by: { type: String, required: true }, // email of the user
     },
