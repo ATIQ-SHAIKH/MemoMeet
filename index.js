@@ -77,11 +77,32 @@ app.get("/*", (_, res) =>
 
 require("./server/models");
 
-// Bind to port
-// if (process.env.ENV === "production") {
-    app.listen(process.env.SRV_PORT, () =>
-        console.log(`🚀 Server running at ${process.env.SRV_PORT}`),
-    );
-// }
+const { Server } = require("socket.io");
 
-module.exports = app;
+const server = app.listen(process.env.SRV_PORT, () =>
+    console.log(`🚀 Server running at ${process.env.SRV_PORT}`),
+);
+const io = new Server(server);
+
+io.on("connection", (socket) => {
+    console.log("A user connected:", socket.id);
+
+    socket.on("offer", (data) => {
+        console.log("Offer received:", data);
+        socket.broadcast.emit("offer", data);
+    });
+
+    socket.on("answer", (data) => {
+        console.log("Answer received:", data);
+        socket.broadcast.emit("answer", data);
+    });
+
+    socket.on("candidate", (data) => {
+        console.log("ICE candidate received:", data);
+        socket.broadcast.emit("candidate", data);
+    });
+
+    socket.on("disconnect", () => {
+        console.log("User disconnected:", socket.id);
+    });
+});
