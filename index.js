@@ -77,11 +77,76 @@ app.get("/*", (_, res) =>
 
 require("./server/models");
 
-// Bind to port
-// if (process.env.ENV === "production") {
-    app.listen(process.env.SRV_PORT, () =>
-        console.log(`🚀 Server running at ${process.env.SRV_PORT}`),
-    );
-// }
+const { Server } = require("socket.io");
 
-module.exports = app;
+const server = app.listen(process.env.SRV_PORT, () =>
+    console.log(`🚀 Server running at ${process.env.SRV_PORT}`),
+);
+const io = new Server(server, {
+    cors: {
+        origin: ALLOWED_DOMAIN,
+        methods: ["GET", "POST", "DELETE", "PUT", "OPTIONS"],
+        credentials: true,
+    }
+});
+
+// Store participants by meeting code
+const meetings = {};
+
+// WebSocket connection handler
+io.on("connection", (socket) => {
+  console.log("New client connected:", socket.id);
+
+  // Join a meeting
+  socket.on("join-meet", (meetCode) => {
+    if (!meetings[meetCode]) {
+      meetings[meetCode] = [];
+    }
+
+    // Add the participant to the meeting
+    meetings[meetCode].push(socket.id);
+    socket.join(meetCode);
+    console.log(`${socket.id} joined meet ${meetCode}`);
+
+    // Notify other participants in the room about the new participant
+    socket.to(meetCode).emit("new-participant", { participantId: socket.id });
+  });
+
+  // Handle offer
+  socket.on("offer", ({ meetCode, offer, recipient }) => {
+    io.to(recipient).emit("offer", { offer, sender: socket.id });
+    console.log(`Offer sent from ${socket.id} to ${recipient}`);
+  });
+
+  // Handle answer
+  socket.on("answer", ({ meetCode, answer, recipient }) => {
+    io.to(recipient).emit("answer", { answer, sender: socket.id });
+    console.log(`Answer sent from ${socket.id} to ${recipient}`);
+  });
+
+  // Handle ICE candidate
+  socket.on("candidate", ({ meetCode, candidate, recipient }) => {
+    io.to(recipient).emit("candidate", { candidate, sender: socket.id });
+    console.log(`Candidate sent from ${socket.id} to ${recipient}`);
+  });
+
+  // Handle participant leaving
+  socket.on("disconnect", () => {
+    console.log("Client disconnected:", socket.id);
+
+    // Remove participant from all meetings
+    for (const [meetCode, participants] of Object.entries(meetings)) {
+      const index = participants.indexOf(socket.id);
+      if (index !== -1) {
+        participants.splice(index, 1);
+        socket.to(meetCode).emit("participant-left", { participantId: socket.id });
+        console.log(`${socket.id} left meet ${meetCode}`);
+      }
+
+      // Clean up empty meetings
+      if (meetings[meetCode].length === 0) {
+        delete meetings[meetCode];
+      }
+    }
+  });
+});
