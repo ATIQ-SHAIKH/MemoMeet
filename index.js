@@ -87,22 +87,28 @@ const io = new Server(server);
 io.on("connection", (socket) => {
     console.log("A user connected:", socket.id);
 
-    socket.on("offer", (data) => {
-        console.log("Offer received:", data);
-        socket.broadcast.emit("offer", data);
-    });
+     // Join a specific room
+  socket.on("join-room", (roomId) => {
+    console.log(`User ${socket.id} joined room ${roomId}`);
+    socket.join(roomId);
+  });
 
-    socket.on("answer", (data) => {
-        console.log("Answer received:", data);
-        socket.broadcast.emit("answer", data);
-    });
+  // Handle offer
+  socket.on("offer", ({ roomId, offer }) => {
+    socket.to(roomId).emit("offer", offer);
+  });
 
-    socket.on("candidate", (data) => {
-        console.log("ICE candidate received:", data);
-        socket.broadcast.emit("candidate", data);
-    });
+  // Handle answer
+  socket.on("answer", ({ roomId, answer }) => {
+    socket.to(roomId).emit("answer", answer);
+  });
 
-    socket.on("disconnect", () => {
-        console.log("User disconnected:", socket.id);
-    });
+  // Handle ICE candidates
+  socket.on("candidate", ({ roomId, candidate }) => {
+    socket.to(roomId).emit("candidate", candidate);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+  });
 });
