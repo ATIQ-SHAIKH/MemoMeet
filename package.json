@@ -2,9 +2,9 @@
   "name": "memomeet",
   "version": "1.0.0",
   "description": "A real-time video conferencing platform",
-  "main": "/api/index.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node ./api/index.js"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -31,6 +31,7 @@
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.6.3",
-    "nodemailer": "^6.9.15"
+    "nodemailer": "^6.9.15",
+    "uuid": "^11.0.3"
   }
 }
