@@ -66,12 +66,6 @@ app.get("/example", (req, res) => {
   res.send(`Client IP: ${req.ip}`);
 });
 
-app.use((req, res, next) => {
-  console.log("Request Origin:", req.headers.origin);
-  console.log("Cookies:", req.cookies);
-  next();
-});
-
 // Load APIs
 app.use("/api", apiRoutes);
 
