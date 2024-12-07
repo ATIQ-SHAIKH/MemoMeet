@@ -145,6 +145,7 @@ const signin = async (req, res) => {
         res.setHeader('Set-Cookie', cookie.serialize('token', token, {
             httpOnly: true,
             secure: true, // Secure cookie in production
+            sameSite: 'None', // Required for cross-site requests
             maxAge: 3600, // 1 hour
             path: '/',
         }));
