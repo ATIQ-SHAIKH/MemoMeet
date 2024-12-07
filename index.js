@@ -67,7 +67,7 @@ app.get("/example", (req, res) => {
 });
 
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'https://memo-meet.netlify.app/');
+  // res.setHeader('Access-Control-Allow-Origin', 'https://memo-meet.netlify.app/');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
