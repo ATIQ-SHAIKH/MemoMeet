@@ -90,63 +90,53 @@ const io = new Server(server, {
   }
 });
 
-// Store participants by meeting code
-const meetings = {};
-
-// WebSocket connection handler
 io.on("connection", (socket) => {
-  console.log("New client connected:", socket.id);
+  console.log(`User Connected :${socket.id}`);
 
-  // Join a meeting
-  socket.on("join-meet", (meetCode) => {
-    if (!meetings[meetCode]) {
-      meetings[meetCode] = [];
+  // Triggered when a peer hits the join room button.
+  socket.on("join", (roomName) => {
+    const { rooms } = io.sockets.adapter;
+    const room = rooms.get(roomName);
+
+    // room == undefined when no such room exists.
+    if (room === undefined) {
+      socket.join(roomName);
+      socket.emit("created");
+    } else if (room.size === 1) {
+      // room.size == 1 when one person is inside the room.
+      socket.join(roomName);
+      socket.emit("joined");
+    } else {
+      // when there are already two people inside the room.
+      socket.emit("full");
     }
-
-    // Add the participant to the meeting
-    meetings[meetCode].push(socket.id);
-    socket.join(meetCode);
-    console.log(`${socket.id} joined meet ${meetCode}`);
-
-    // Notify other participants in the room about the new participant
-    socket.to(meetCode).emit("new-participant", { participantId: socket.id });
+    console.log(rooms);
   });
 
-  // Handle offer
-  socket.on("offer", ({ meetCode, offer, recipient }) => {
-    io.to(recipient).emit("offer", { offer, sender: socket.id });
-    console.log(`Offer sent from ${socket.id} to ${recipient}`);
+  // Triggered when the person who joined the room is ready to communicate.
+  socket.on("ready", (roomName) => {
+    socket.broadcast.to(roomName).emit("ready"); // Informs the other peer in the room.
   });
 
-  // Handle answer
-  socket.on("answer", ({ meetCode, answer, recipient }) => {
-    io.to(recipient).emit("answer", { answer, sender: socket.id });
-    console.log(`Answer sent from ${socket.id} to ${recipient}`);
+  // Triggered when server gets an icecandidate from a peer in the room.
+  socket.on("ice-candidate", (candidate, roomName) => {
+    console.log(candidate);
+    socket.broadcast.to(roomName).emit("ice-candidate", candidate); // Sends Candidate to the other peer in the room.
   });
 
-  // Handle ICE candidate
-  socket.on("candidate", ({ meetCode, candidate, recipient }) => {
-    io.to(recipient).emit("candidate", { candidate, sender: socket.id });
-    console.log(`Candidate sent from ${socket.id} to ${recipient}`);
+  // Triggered when server gets an offer from a peer in the room.
+  socket.on("offer", (offer, roomName) => {
+    socket.broadcast.to(roomName).emit("offer", offer); // Sends Offer to the other peer in the room.
   });
 
-  // Handle participant leaving
-  socket.on("disconnect", () => {
-    console.log("Client disconnected:", socket.id);
-
-    // Remove participant from all meetings
-    for (const [meetCode, participants] of Object.entries(meetings)) {
-      const index = participants.indexOf(socket.id);
-      if (index !== -1) {
-        participants.splice(index, 1);
-        socket.to(meetCode).emit("participant-left", { participantId: socket.id });
-        console.log(`${socket.id} left meet ${meetCode}`);
-      }
-
-      // Clean up empty meetings
-      if (meetings[meetCode].length === 0) {
-        delete meetings[meetCode];
-      }
-    }
+  // Triggered when server gets an answer from a peer in the room.
+  socket.on("answer", (answer, roomName) => {
+    socket.broadcast.to(roomName).emit("answer", answer); // Sends Answer to the other peer in the room.
   });
+
+  socket.on("leave", (roomName) => {
+    socket.leave(roomName);
+    socket.broadcast.to(roomName).emit("leave");
+  });
+
 });
