@@ -94,49 +94,37 @@ io.on("connection", (socket) => {
   console.log(`User Connected :${socket.id}`);
 
   // Triggered when a peer hits the join room button.
-  socket.on("join", (roomName) => {
+  socket.on("join", ({ roomId: roomName }) => {
     const { rooms } = io.sockets.adapter;
     const room = rooms.get(roomName);
-
-    // room == undefined when no such room exists.
-    if (room === undefined) {
-      socket.join(roomName);
-      socket.emit("created");
-    } else if (room.size === 1) {
-      // room.size == 1 when one person is inside the room.
-      socket.join(roomName);
-      socket.emit("joined");
-    } else {
-      // when there are already two people inside the room.
-      socket.emit("full");
-    }
-    console.log(rooms);
+    console.log(roomName, room, rooms, 'r');
+    socket.join(roomName);
+    const roomm = rooms.get(roomName);
+    console.log(roomName, roomm, rooms, 'r');
+    socket.to(roomName).emit("joined", { newPeerSocketId: socket.id })
   });
 
-  // Triggered when the person who joined the room is ready to communicate.
-  socket.on("ready", (roomName) => {
-    socket.broadcast.to(roomName).emit("ready"); // Informs the other peer in the room.
+  // // Triggered when server gets an icecandidate from a peer in the room.
+  socket.on('ice-candidate', (iceCandidate, targetSocketId) => {
+    console.log(`Ice candidate received on server to be able to send to ${targetSocketId} `, iceCandidate)
+
+    socket.to(targetSocketId).emit('ice-candidate', iceCandidate, socket.id)
+  })
+
+  // // Triggered when server gets an offer from a peer in the room.
+  socket.on("offer", ({ offer, to }) => {
+    socket.to(to).emit("offer", { offer, from: socket.id }); // Sends Offer to the other peer in the room.
   });
 
-  // Triggered when server gets an icecandidate from a peer in the room.
-  socket.on("ice-candidate", (candidate, roomName) => {
-    console.log(candidate);
-    socket.broadcast.to(roomName).emit("ice-candidate", candidate); // Sends Candidate to the other peer in the room.
+  // // Triggered when server gets an answer from a peer in the room.
+  socket.on("answer", ({ answer, to }) => {
+    socket.to(to).emit('answer', { answer, from: socket.id }); // Sends Answer to the other peer in the room.
   });
 
-  // Triggered when server gets an offer from a peer in the room.
-  socket.on("offer", (offer, roomName) => {
-    socket.broadcast.to(roomName).emit("offer", offer); // Sends Offer to the other peer in the room.
-  });
-
-  // Triggered when server gets an answer from a peer in the room.
-  socket.on("answer", (answer, roomName) => {
-    socket.broadcast.to(roomName).emit("answer", answer); // Sends Answer to the other peer in the room.
-  });
-
-  socket.on("leave", (roomName) => {
+  socket.on('leave', (roomName) => {
+    console.log("leave")
+    socket.to(roomName).emit('user-left', socket.id);
     socket.leave(roomName);
-    socket.broadcast.to(roomName).emit("leave");
-  });
+  })
 
 });
